@@ -194,14 +194,14 @@ device_search() {
 #  success "suspend service"
 #}
 
-#last_datetime() {
-#  local last_dt=$(query_database "SELECT fecha
-#    FROM vehiculos v
-#    LEFT JOIN last_positions_gps AS lpg ON (lpg.gps_id=v.gps_id)
-#    WHERE placa=lower('$1');" "-t")
+last_datetime() {
+  local last_dt=$(query_database "SELECT fecha
+    FROM vehiculos v
+    LEFT JOIN last_positions_gps AS lpg ON (lpg.gps_id=v.gps_id)
+    WHERE placa=lower('$1');" "-t")
 
-#    echo $last_dt
-#}
+    echo $last_dt
+}
 
 get_gps_id() {
   local query=$(query_database "SELECT gps_id
@@ -237,21 +237,21 @@ get_vehicle_id() {
 #  echo $count_positions_gps
 #}
 
-#delete_states_from_vehicule() {
-#  local ldt="$1"
-#  local vehicle_id=$2
+delete_states_from_vehicule() {
+  local ldt="$1"
+  local vehicle_id=$2
 
-#  local delete=$(query_database "DELETE FROM vehicle_state_history 
-#    WHERE fecha < '$ldt' and vehicle_id=$vehicle_id")
-#}
+  local delete=$(query_database "DELETE FROM vehicle_state_history 
+    WHERE fecha < '$ldt' and vehicle_id=$vehicle_id")
+}
 
-#delete_positions_gps() {
-#  local ldt="$1"
-#  local gps_id=$2
+delete_positions_gps() {
+  local ldt="$1"
+  local gps_id=$2
 
-#  local delete=$(query_database "DELETE FROM positions_gps 
-#    WHERE fecha < '$ldt' and gps_id=$gps_id")
-#}
+  local delete=$(query_database "DELETE FROM positions_gps 
+    WHERE fecha < '$ldt' and gps_id=$gps_id")
+}
 
 
 # }}}
@@ -274,7 +274,7 @@ fi
 
 output_color ${Blue}; vehicle_information; information_of_customer; output_clear
 
-printf "type 1 for to continue with the deactivated from vehicle, 
+printf "type 1 for to continue with the delete and unlink of the client from vehicle,
   followed by [ENTER ↵]: "
 read typed
 
@@ -288,32 +288,32 @@ output_color ${Green}; unlinked_client_of_the_vehicle; output_clear
 #deactivate_device
 #suspend_service
 
-#ldt=$(last_datetime $PLATE)
+ldt=$(last_datetime $PLATE)
 v_id=$(get_vehicle_id)
 g_id=$(get_gps_id)
-#success "last datetime of report of the vehicle: $ldt"
+success "last datetime of report of the vehicle: $ldt"
 #echo "counting amount of reports of the vehicle. Please timeout"
 #c_st=$(count_states_from_vehicule "$ldt" $v_id)
 #c_pg=$(count_positions_from_gps "$ldt" $g_id)
 #success "you have $c_st states of the vehicle for delete"
 #success "you have $c_pg reports of the vehicle for delete"
 
-#printf "type 1 for to continue with delete of the history from vehicle, 
-#  followed by [ENTER ↵]: "
-#read typed
+printf "type 1 for to continue with delete of the history from vehicle,
+  followed by [ENTER ↵]: "
+read typed
 
-#if (( typed == 1 )); then
+if (( typed == 1 )); then
 
-#  delete_states_from_vehicule "$ldt" $v_id &
-#  delete_positions_gps "$ldt" $g_id &
+  delete_states_from_vehicule "$ldt" $v_id &
+  delete_positions_gps "$ldt" $g_id &
   
-#  success "all vehicle history is deleted\n"
+  success "all vehicle history is deleted\n"
 
-#  vehicle_information
-#  device_search
-#else
-#  error "exit without delete history from vehicle"
-#fi
+  vehicle_information
+  device_search
+else
+  error "exit without delete history from vehicle"
+fi
 
 vehicle_information
 device_search
